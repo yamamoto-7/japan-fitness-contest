@@ -1,36 +1,154 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Japan Fitness Contest
 
-## Getting Started
+日本国内の筋トレ・フィットネス大会情報をまとめた非公式情報サイトです。
 
-First, run the development server:
+FWJ・JBBF・IFBBを中心に、大会日程や開催情報を一元化し、競技者・観戦者・大会参加予定者が必要な情報へ素早くアクセスできることを目的としています。
+
+将来的には大会結果、選手情報、関連記事などを追加し、筋トレ・フィットネス競技の総合情報サイトを目指します。
+
+---
+
+## サイト概要
+
+### 公開側
+
+- トップページ
+- 大会カレンダー
+- 大会詳細
+- 大会結果（Phase2）
+- 検索機能（予定）
+
+### 管理側
+
+- 管理者ログイン
+- 大会登録
+- 大会編集
+- 大会削除
+- 公開・非公開管理
+
+---
+
+## 技術構成
+
+| 項目 | 技術 |
+|------|------|
+| フレームワーク | Next.js |
+| 言語 | TypeScript |
+| API | Hono |
+| ORM | Drizzle ORM |
+| データベース | PostgreSQL |
+| DB | Neon または Supabase |
+| スタイル | Tailwind CSS |
+| 認証 | Auth.js（予定） |
+| ホスティング | Vercel |
+
+---
+
+## 開発環境
+
+### インストール
+
+```bash
+npm install
+```
+
+### 開発サーバー起動
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+ブラウザで以下を開きます。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## ブランチ運用
 
-To learn more about Next.js, take a look at the following resources:
+| ブランチ | 用途 |
+|----------|------|
+| main | 本番環境 |
+| develop | 開発環境 |
+| feature/* | 機能開発 |
+| fix/* | バグ修正 |
+| hotfix/* | 緊急修正 |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### ブランチ名例
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+feature/event-calendar
+feature/admin-events
+fix/calendar-layout
+```
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## コミットメッセージルール
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Conventional Commits に沿って管理します。
+
+| 種別 | 内容 |
+|------|------|
+| feat | 新機能追加 |
+| fix | バグ修正 |
+| chore | 環境構築・設定変更 |
+| docs | ドキュメント |
+| style | コード整形のみ |
+| refactor | リファクタリング |
+| test | テスト |
+| ci | CI/CD |
+| perf | パフォーマンス改善 |
+
+### コミット例
+
+```text
+feat: 大会カレンダーを追加
+
+feat: 管理画面を実装
+
+fix: カレンダーの表示崩れを修正
+
+chore: Next.jsプロジェクトを初期化
+
+chore: Drizzleを導入
+
+docs: READMEを更新
+```
+
+---
+
+## 開発予定
+
+### Phase1
+
+- [ ] 管理者ログイン
+- [ ] 大会CRUD
+- [ ] 大会カレンダー
+- [ ] 大会詳細
+- [ ] レスポンシブ対応
+- [ ] Vercel公開
+
+### Phase2
+
+- [ ] 大会結果
+- [ ] 選手ページ
+- [ ] 検索機能
+- [ ] ブログ
+
+### Phase3
+
+- [ ] Google AdSense
+- [ ] アフィリエイト
+- [ ] スポンサー掲載
+- [ ] AIによる大会情報取得
+
+---
+
+## 注意事項
+
+- 本サイトは非公式の情報サイトです。
+- 最新・正確な情報は各団体の公式サイトをご確認ください。
+- 公式団体・大会運営とは関係ありません。
