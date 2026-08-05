@@ -5,6 +5,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "db:down": "docker compose down",
+    "db:logs": "docker compose logs -f db",
+    "db:up": "docker compose up -d --wait",
     "start": "next start",
     "lint": "eslint"
   },

@@ -25,10 +25,40 @@
 
 ```bash
 npm install
+npm run db:up
 npm run dev
 ```
 
-開発サーバーは通常 `http://localhost:3000` です。管理者認証を利用する場合は `.env.local` に `AUTH_SECRET`、`ADMIN_EMAIL`、`ADMIN_PASSWORD_HASH` を設定します。DB実装後はマイグレーションと開発用大会シードの手順を追加します。実際のDrizzle用npm scriptも導入時に `package.json` と本書へ追加します。
+開発サーバーは通常 `http://localhost:3000`、ローカルPostgreSQLは `localhost:5432` です。管理者認証を利用する場合は `.env.local` に `AUTH_SECRET`、`ADMIN_EMAIL`、`ADMIN_PASSWORD_HASH` を設定します。DB接続には次の値を設定します。
+
+```env
+DATABASE_URL=postgresql://japan_fitness:local_password@localhost:5432/japan_fitness
+```
+
+### ローカルPostgreSQLの操作
+
+| 操作 | コマンド |
+| --- | --- |
+| 起動し、ヘルスチェック完了まで待機 | `npm run db:up` |
+| ログを表示 | `npm run db:logs` |
+| 停止 | `npm run db:down` |
+| 状態確認 | `docker compose ps` |
+
+`npm run db:down` では名前付きボリュームを残すため、次回起動時もデータが維持されます。`docker compose down -v` はローカルDBを完全に削除する場合だけ使用します。
+
+### CRUD実装へ進むフロー
+
+1. `npm run db:up` でPostgreSQLを起動する
+2. Drizzleの `events` スキーマとDB接続を実装する
+3. `drizzle.config.ts` とマイグレーション用npm scriptsを追加する
+4. 初回マイグレーションを生成し、SQLをレビューする
+5. ローカルDBへマイグレーションを適用する
+6. 開発用の架空大会データをseedする
+7. 認証必須の大会CRUD API・DALを実装する
+8. 管理画面の大会一覧・登録・編集・削除を実装する
+9. 非公開大会が公開APIへ出ないことをDB統合テストで確認する
+
+Drizzle用の `db:generate`、`db:migrate`、`db:seed` scriptsはスキーマ実装時に追加します。
 
 ## 4. 推奨実装順序
 
