@@ -49,16 +49,16 @@ DATABASE_URL=postgresql://japan_fitness:local_password@localhost:5432/japan_fitn
 ### CRUD実装へ進むフロー
 
 1. `npm run db:up` でPostgreSQLを起動する
-2. Drizzleの `events` スキーマとDB接続を実装する
-3. `drizzle.config.ts` とマイグレーション用npm scriptsを追加する
-4. 初回マイグレーションを生成し、SQLをレビューする
-5. ローカルDBへマイグレーションを適用する
+2. Drizzleの `events` スキーマとDB接続を実装する（完了）
+3. `drizzle.config.ts` とマイグレーション用npm scriptsを追加する（完了）
+4. `npm run db:generate` でマイグレーションを生成し、SQLをレビューする
+5. `npm run db:migrate` でローカルDBへマイグレーションを適用する
 6. 開発用の架空大会データをseedする
 7. 認証必須の大会CRUD API・DALを実装する
 8. 管理画面の大会一覧・登録・編集・削除を実装する
 9. 非公開大会が公開APIへ出ないことをDB統合テストで確認する
 
-Drizzle用の `db:generate`、`db:migrate`、`db:seed` scriptsはスキーマ実装時に追加します。
+`db:generate`、`db:migrate`、`db:studio` scriptsは追加済みです。`db:seed` は開発用大会データを作成するときに追加します。
 
 ## 4. 推奨実装順序
 

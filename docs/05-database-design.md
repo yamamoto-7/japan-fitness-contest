@@ -42,6 +42,7 @@ CHECK (char_length(trim(organization)) > 0)
 CHECK (char_length(trim(location)) > 0)
 CHECK (end_date >= start_date)
 CHECK (official_url IS NULL OR official_url ~ '^https?://')
+CHECK (description IS NULL OR char_length(description) <= 10000)
 ```
 
 URLの厳密な検証はアプリケーション層で行い、DB制約は最低限の防御とします。
