@@ -34,12 +34,12 @@ JBBF・ZeniX・IFBBを中心に、大会日程や開催情報を一元化し、�
 |------|------|
 | フレームワーク | Next.js |
 | 言語 | TypeScript |
-| API | Hono |
+| API | Next.js Route Handler |
 | ORM | Drizzle ORM |
 | データベース | PostgreSQL |
-| DB | Neon または Supabase |
+| DB | PostgreSQL（ローカルDocker） |
 | スタイル | Tailwind CSS |
-| 認証 | Auth.js（予定） |
+| 認証 | 署名付きHttpOnly Cookie（Phase 1） |
 | ホスティング | Vercel |
 
 ---
@@ -55,6 +55,9 @@ npm install
 ### 開発サーバー起動
 
 ```bash
+npm run db:up
+npm run db:migrate
+npm run db:seed
 npm run dev
 ```
 
@@ -125,7 +128,7 @@ docs: READMEを更新
 ### Phase1
 
 - [x] 管理者ログイン
-- [ ] 大会CRUD
+- [x] 大会CRUD
 - [ ] 大会カレンダー
 - [ ] 大会詳細
 - [ ] レスポンシブ対応

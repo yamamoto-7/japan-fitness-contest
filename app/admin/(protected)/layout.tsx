@@ -4,6 +4,7 @@ import { getAdminById } from "@/lib/auth/admin-user";
 import { requireAdminSession } from "@/lib/auth/dal";
 import { LogoutButton } from "./logout-button";
 import { SessionActivityMonitor } from "./session-activity-monitor";
+import { AdminNav } from "./admin-nav";
 import styles from "../admin.module.css";
 
 export default async function ProtectedAdminLayout({
@@ -25,11 +26,7 @@ export default async function ProtectedAdminLayout({
           <Link className={styles.adminLogo} href="/admin" aria-label="管理画面トップへ">
             <Logo />
           </Link>
-          <nav aria-label="管理メニュー">
-            <Link className={styles.currentNav} href="/admin">ダッシュボード</Link>
-            <span aria-disabled="true">大会管理</span>
-            <span aria-disabled="true">団体管理</span>
-          </nav>
+          <AdminNav />
           <div className={styles.adminAccount}>
             <span>ログイン中</span>
             <strong>{admin.email}</strong>

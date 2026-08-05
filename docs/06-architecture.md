@@ -7,12 +7,12 @@
 | Framework | Next.js 16.3.0 App Router | 導入済み |
 | Language | TypeScript | 導入済み |
 | UI | React 19.2.8 / Tailwind CSS 4 | 導入済み |
-| API | Hono 4 | 依存導入済み、未実装 |
-| Validation | Zod 4 | 依存導入済み、未実装 |
-| Form | React Hook Form | 依存導入済み、未実装 |
-| ORM | Drizzle ORM / Drizzle Kit | 依存導入済み、未実装 |
-| Database | PostgreSQL（NeonまたはSupabase） | 未決定 |
-| Authentication | Auth.js予定 | 未導入・未決定 |
+| API | Next.js Route Handler | 管理大会CRUDを実装済み |
+| Validation | Zod 4 | 管理大会CRUDで導入済み |
+| Form | React Client Components | 管理大会フォームを実装済み |
+| ORM | Drizzle ORM / Drizzle Kit | 導入済み |
+| Database | PostgreSQL（ローカルDocker、本番サービス未決定） | ローカル導入済み |
+| Authentication | 環境変数の固定管理者＋署名付きCookie | Phase 1実装済み |
 | Hosting | Vercel | 未設定 |
 
 ## 2. 論理構成
@@ -25,10 +25,10 @@
           ▼
 Next.js App Router
   ├─ Page / Layout / Metadata
-  └─ app/api/[[...route]]/route.ts
+  └─ app/api/**/route.ts
           │
           ▼
-Hono API（入力検証、認証・認可、ユースケース、DTO変換）
+Route Handler（入力検証、認証・認可、DTO変換）
           │
           ▼
 Data Access Layer / Drizzle ORM
@@ -44,7 +44,7 @@ Next.js 16同梱ドキュメントに従い、APIはRoute Handlerの `route.ts` 
 | 層 | 責務 |
 | --- | --- |
 | Pages / Components | 表示、操作、アクセシビリティ。秘密情報を扱わない |
-| Hono Routes | HTTP入出力、ステータス、認証要求、検証呼び出し |
+| Route Handlers | HTTP入出力、ステータス、認証要求、検証呼び出し |
 | Use Cases / Services | 大会の取得・登録・更新・削除、ビジネスルール |
 | DAL / Repositories | DBクエリ、公開条件、トランザクション |
 | Schemas / DTO | 入力検証、公開可能フィールドの限定、型変換 |
@@ -68,7 +68,9 @@ app/
 │     ├─ page.tsx
 │     ├─ new/page.tsx
 │     └─ [id]/edit/page.tsx
-├─ api/[[...route]]/route.ts
+├─ api/
+│  ├─ auth/*/route.ts
+│  └─ admin/events/**/route.ts
 ├─ sitemap.ts
 ├─ robots.ts
 ├─ opengraph-image.*
@@ -89,7 +91,7 @@ tests/
 docs/
 ```
 
-Route Group `(public)` はURLへ影響せず、公開側レイアウトを整理するための案です。Hono統合のcatch-all Route Handlerは採用するアダプターの互換性を小さな検証実装で確認してから確定します。
+Route Group `(public)` はURLへ影響せず、公開側レイアウトを整理するための案です。Phase 1の管理APIは個別のRoute Handlerとして実装しています。
 
 ## 5. データ取得・キャッシュ
 

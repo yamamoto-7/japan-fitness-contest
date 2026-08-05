@@ -29,10 +29,10 @@ npm run db:up
 npm run dev
 ```
 
-開発サーバーは通常 `http://localhost:3000`、ローカルPostgreSQLは `localhost:5432` です。管理者認証を利用する場合は `.env.local` に `AUTH_SECRET`、`ADMIN_EMAIL`、`ADMIN_PASSWORD_HASH` を設定します。DB接続には次の値を設定します。
+開発サーバーは通常 `http://localhost:3000`、ローカルPostgreSQLはホスト側の競合を避けて `localhost:5433` で公開します。管理者認証を利用する場合は `.env.local` に `AUTH_SECRET`、`ADMIN_EMAIL`、`ADMIN_PASSWORD_HASH` を設定します。DB接続には次の値を設定します。
 
 ```env
-DATABASE_URL=postgresql://japan_fitness:local_password@localhost:5432/japan_fitness
+DATABASE_URL=postgresql://japan_fitness:local_password@localhost:5433/japan_fitness
 ```
 
 ### ローカルPostgreSQLの操作
@@ -43,6 +43,8 @@ DATABASE_URL=postgresql://japan_fitness:local_password@localhost:5432/japan_fitn
 | ログを表示 | `npm run db:logs` |
 | 停止 | `npm run db:down` |
 | 状態確認 | `docker compose ps` |
+| マイグレーション適用 | `npm run db:migrate` |
+| 開発用大会データ投入 | `npm run db:seed` |
 
 `npm run db:down` では名前付きボリュームを残すため、次回起動時もデータが維持されます。`docker compose down -v` はローカルDBを完全に削除する場合だけ使用します。
 
@@ -53,12 +55,12 @@ DATABASE_URL=postgresql://japan_fitness:local_password@localhost:5432/japan_fitn
 3. `drizzle.config.ts` とマイグレーション用npm scriptsを追加する（完了）
 4. `npm run db:generate` でマイグレーションを生成し、SQLをレビューする
 5. `npm run db:migrate` でローカルDBへマイグレーションを適用する
-6. 開発用の架空大会データをseedする
-7. 認証必須の大会CRUD API・DALを実装する
-8. 管理画面の大会一覧・登録・編集・削除を実装する
+6. `npm run db:seed` で開発用の架空大会データを投入する（完了）
+7. 認証必須の大会CRUD API・DALを実装する（完了）
+8. 管理画面の大会一覧・登録・編集・削除・公開切替を実装する（完了）
 9. 非公開大会が公開APIへ出ないことをDB統合テストで確認する
 
-`db:generate`、`db:migrate`、`db:studio` scriptsは追加済みです。`db:seed` は開発用大会データを作成するときに追加します。
+`db:generate`、`db:migrate`、`db:studio`、`db:seed` scriptsは追加済みです。`db:seed` は固定UUIDとupsertを使うため再実行しても重複しません。
 
 ## 4. 推奨実装順序
 

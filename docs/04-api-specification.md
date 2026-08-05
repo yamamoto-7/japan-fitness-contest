@@ -2,7 +2,7 @@
 
 ## 1. 概要
 
-Phase 1 のAPIは Hono で実装し、Next.js App Router の Route Handler から `/api` 配下へ公開する設計案です。パスは元要件を維持します。
+Phase 1 のAPIは Next.js App Router の Route Handlerで実装し、`/api` 配下へ公開します。Honoは現時点では使用していません。
 
 | Method | Path | 用途 | 認証 |
 | --- | --- | --- | --- |
@@ -12,8 +12,11 @@ Phase 1 のAPIは Hono で実装し、Next.js App Router の Route Handler か�
 | POST | `/api/admin/events` | 大会登録 | 必要 |
 | PATCH | `/api/admin/events/:id` | 大会更新 | 必要 |
 | DELETE | `/api/admin/events/:id` | 大会削除 | 必要 |
+| POST | `/api/auth/login` | 管理者ログイン | 不要 |
+| POST | `/api/auth/refresh` | 操作中のセッション延長 | 必要 |
+| POST | `/api/auth/logout` | 管理者ログアウト | 必要 |
 
-ログイン・ログアウト・セッションAPIのパスは認証方式の決定後に追記します。
+管理APIは環境変数で定義した固定管理者の署名付きHttpOnly Cookieセッションを検証します。変更系リクエストでは同一オリジンも検証します。
 
 ## 2. 共通仕様
 
@@ -150,6 +153,10 @@ POSTでは全必須項目を送信します。PATCHでは変更対象だけを�
 ### `GET /api/admin/events`
 
 公開APIのクエリに加え、`published`（公開状態）と `q`（大会名・開催地の検索案）を利用できます。公開・非公開を含むAdminEventの配列を返します。
+
+### `GET /api/admin/events/:id`
+
+指定IDのAdminEventを返します。UUID形式不正または対象なしは404です。
 
 ### `POST /api/admin/events`
 
