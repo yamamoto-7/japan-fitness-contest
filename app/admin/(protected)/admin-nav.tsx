@@ -18,7 +18,12 @@ export function AdminNav() {
       >
         大会管理
       </Link>
-      <span aria-disabled="true">団体管理</span>
+      <Link
+        className={pathname.startsWith("/admin/organizations") ? styles.currentNav : undefined}
+        href="/admin/organizations"
+      >
+        団体管理
+      </Link>
     </nav>
   );
 }

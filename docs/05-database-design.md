@@ -12,19 +12,30 @@
 ## 2. ER概要
 
 ```text
-events
+organizations 1 ─── N events
   └─ Phase 2で results、event_athletes 等との関連を追加予定
 ```
 
 Phase 1の管理者は1名固定で環境変数から取得するため、`admins` テーブルは作成しません。監査要件が必要になった場合は管理者テーブルと `created_by`、`updated_by` を追加します。
 
-## 3. `events` テーブル
+## 3. `organizations` テーブル
+
+| Column | PostgreSQL型 | Null | Default | 制約・用途 |
+| --- | --- | --- | --- | --- |
+| `id` | `uuid` | NO | UUID生成 | 主キー |
+| `name` | `varchar(100)` | NO | なし | 団体名、空文字不可、一意 |
+| `created_at` | `timestamptz` | NO | `now()` | 作成日時 |
+| `updated_at` | `timestamptz` | NO | `now()` | 更新時にアプリ側で変更 |
+
+団体名の重複は `organizations_name_unique_idx` で防ぎます。大会から参照されている団体の削除は外部キーで制限します。
+
+## 4. `events` テーブル
 
 | Column | PostgreSQL型案 | Null | Default | 制約・用途 |
 | --- | --- | --- | --- | --- |
 | `id` | `uuid` | NO | UUID生成 | 主キー |
 | `name` | `varchar(200)` | NO | なし | 大会名、空文字不可 |
-| `organization` | `varchar(100)` | NO | なし | 団体名、空文字不可 |
+| `organization_id` | `uuid` | NO | なし | `organizations.id` への外部キー、削除制限 |
 | `start_date` | `date` | NO | なし | 開始日 |
 | `end_date` | `date` | NO | なし | 終了日、開始日以降 |
 | `location` | `varchar(255)` | NO | なし | 開催地、空文字不可 |
@@ -38,7 +49,6 @@ Phase 1の管理者は1名固定で環境変数から取得するため、`admin
 
 ```sql
 CHECK (char_length(trim(name)) > 0)
-CHECK (char_length(trim(organization)) > 0)
 CHECK (char_length(trim(location)) > 0)
 CHECK (end_date >= start_date)
 CHECK (official_url IS NULL OR official_url ~ '^https?://')
@@ -53,12 +63,12 @@ URLの厳密な検証はアプリケーション層で行い、DB制約は最低
 | --- | --- | --- |
 | `events_pkey` | `id` | 主キー検索 |
 | `events_public_date_idx` | `is_published, start_date, end_date` | 公開一覧、カレンダー |
-| `events_organization_idx` | `organization` | 団体絞り込み |
+| `events_organization_id_idx` | `organization_id` | 団体結合・絞り込み |
 | `events_updated_at_idx` | `updated_at DESC` | 更新情報、管理一覧 |
 
 初期段階では過剰なインデックスを避け、実行計画と実測に基づいて変更します。
 
-## 4. 将来拡張: `admins` テーブル
+## 5. 将来拡張: `admins` テーブル
 
 複数管理者または権限管理が必要になった時点で、以下のテーブルを追加する案とします。Phase 1のマイグレーション対象には含めません。
 
@@ -75,12 +85,13 @@ URLの厳密な検証はアプリケーション層で行い、DB制約は最低
 - `password_hash` はAPIレスポンス、ログ、クライアントコードへ出さない
 - Auth.jsアダプター採用時は標準スキーマとの整合を取り、本定義を置き換える可能性がある
 
-## 5. Drizzle上の名前対応
+## 6. Drizzle上の名前対応
 
 | DB | TypeScript |
 | --- | --- |
 | `start_date` | `startDate` |
 | `end_date` | `endDate` |
+| `organization_id` | `organizationId` |
 | `official_url` | `officialUrl` |
 | `is_published` | `isPublished` |
 | `created_at` | `createdAt` |
@@ -88,7 +99,7 @@ URLの厳密な検証はアプリケーション層で行い、DB制約は最低
 
 入力検証、API DTO、DBスキーマは役割を分けます。DBレコードをそのまま公開APIへ返さず、公開用DTOで許可フィールドだけを選択します。
 
-## 6. マイグレーション運用
+## 7. マイグレーション運用
 
 1. Drizzleスキーマを変更する
 2. マイグレーションを生成する
@@ -99,9 +110,9 @@ URLの厳密な検証はアプリケーション層で行い、DB制約は最低
 
 適用済みマイグレーションを直接書き換えません。修正は新しいマイグレーションで行います。破壊的変更ではバックアップと復旧手順を用意します。
 
-## 7. 初期データ
+## 8. 初期データ
 
 - Phase 1の管理者メールアドレスとハッシュ済みパスワードはサーバー側環境変数で設定する
 - 管理者のパスワード、ハッシュ、セッション署名鍵をGitへコミットしない
-- 大会の開発用シードは架空データと明示する
+- 団体と大会の開発用シードは架空データと明示する
 - 実在大会データには公式URLと確認日を運用上記録することを推奨する

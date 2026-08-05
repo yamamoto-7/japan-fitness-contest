@@ -17,7 +17,7 @@ const nullableText = (max: number) =>
 const eventFieldsSchema = z
   .object({
     name: z.string().trim().min(1, "大会名は必須です。").max(200),
-    organization: z.string().trim().min(1, "団体名は必須です。").max(100),
+    organizationId: z.string().uuid("登録済みの団体を選択してください。"),
     startDate: isoDateSchema,
     endDate: isoDateSchema,
     location: z.string().trim().min(1, "開催地は必須です。").max(255),

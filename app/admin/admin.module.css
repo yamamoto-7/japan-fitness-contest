@@ -414,7 +414,8 @@
 .filterBar select,
 .filterBar button,
 .eventForm input,
-.eventForm textarea {
+.eventForm textarea,
+.eventForm select {
   border: 1px solid var(--admin-line);
   outline: none;
   background: var(--admin-panel-light);
@@ -560,12 +561,17 @@
 }
 
 .formGrid input,
-.formGrid textarea {
+.formGrid textarea,
+.formGrid select {
   width: 100%;
   padding: 12px 13px;
 }
 
 .formGrid input {
+  min-height: 45px;
+}
+
+.formGrid select {
   min-height: 45px;
 }
 
@@ -588,6 +594,11 @@
   width: 17px;
   min-height: 17px;
   margin: 0;
+}
+
+.fieldHint {
+  color: #e0a367;
+  font-size: 9px;
 }
 
 .formActions {

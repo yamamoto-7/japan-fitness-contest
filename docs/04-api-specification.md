@@ -12,6 +12,11 @@ Phase 1 のAPIは Next.js App Router の Route Handlerで実装し、`/api` 配�
 | POST | `/api/admin/events` | 大会登録 | 必要 |
 | PATCH | `/api/admin/events/:id` | 大会更新 | 必要 |
 | DELETE | `/api/admin/events/:id` | 大会削除 | 必要 |
+| GET | `/api/admin/organizations` | 管理用団体一覧 | 必要 |
+| POST | `/api/admin/organizations` | 団体登録 | 必要 |
+| GET | `/api/admin/organizations/:id` | 団体取得 | 必要 |
+| PATCH | `/api/admin/organizations/:id` | 団体更新 | 必要 |
+| DELETE | `/api/admin/organizations/:id` | 団体削除 | 必要 |
 | POST | `/api/auth/login` | 管理者ログイン | 不要 |
 | POST | `/api/auth/refresh` | 操作中のセッション延長 | 必要 |
 | POST | `/api/auth/logout` | 管理者ログアウト | 必要 |
@@ -109,14 +114,14 @@ Phase 1 のAPIは Next.js App Router の Route Handlerで実装し、`/api` 配�
 
 ### AdminEvent
 
-PublicEventに `isPublished` と `createdAt` を追加します。
+PublicEventに `organizationId`、`isPublished` と `createdAt` を追加します。
 
 ### EventInput
 
 ```json
 {
   "name": "Japan Fitness Contest 2026",
-  "organization": "JBBF",
+  "organizationId": "7eb0382d-7165-4953-9a30-966a4c5d8953",
   "startDate": "2026-08-15",
   "endDate": "2026-08-15",
   "location": "東京都内",
@@ -127,6 +132,7 @@ PublicEventに `isPublished` と `createdAt` を追加します。
 ```
 
 POSTでは全必須項目を送信します。PATCHでは変更対象だけを送信できますが、更新後の全体が入力規則を満たす必要があります。
+`organizationId` は `organizations` テーブルに存在するIDに限ります。レスポンスでは表示用の `organization`（団体名）も返します。
 
 ## 4. 公開API
 
@@ -180,6 +186,27 @@ POSTでは全必須項目を送信します。PATCHでは変更対象だけを�
 
 将来、大会結果等が紐づく場合は外部キー制約と削除方式を再検討します。
 
+### `GET /api/admin/organizations`
+
+団体を名前順で返します。各団体には紐づく `eventCount` を含めます。
+
+### `POST /api/admin/organizations`
+
+- `{ "name": "団体名" }` を受け取り団体を登録する
+- 成功: `201`、同名の団体が存在する場合: `409 ORGANIZATION_CONFLICT`
+
+### `GET /api/admin/organizations/:id`
+
+指定IDの団体を返します。UUID形式不正または対象なしは404です。
+
+### `PATCH /api/admin/organizations/:id`
+
+団体名を更新します。空オブジェクトは400、同名競合は409です。
+
+### `DELETE /api/admin/organizations/:id`
+
+団体を物理削除します。大会から参照中の場合は `409 ORGANIZATION_CONFLICT` とし、削除しません。
+
 ## 6. エラーコード
 
 | Code | 意味 |
@@ -188,13 +215,14 @@ POSTでは全必須項目を送信します。PATCHでは変更対象だけを�
 | `UNAUTHENTICATED` | ログインが必要 |
 | `FORBIDDEN` | 操作権限がない |
 | `EVENT_NOT_FOUND` | 対象大会が見つからない |
+| `ORGANIZATION_NOT_FOUND` | 選択した団体が見つからない |
+| `ORGANIZATION_CONFLICT` | 団体名の重複、または大会から参照中で削除できない |
 | `CONFLICT` | データ競合 |
 | `RATE_LIMITED` | リクエスト回数超過 |
 | `INTERNAL_ERROR` | 想定外エラー |
 
 ## 7. テスト上の注意
 
-- HonoのベースパスとNext.js側のRoute Handlerでパスが二重にならないよう統合テストする
 - DBのsnake_caseをAPIのcamelCaseへ変換する
 - 公開APIで非公開データを取得できないテストを必須とする
 - 管理APIごとに未認証・権限不足を検証する

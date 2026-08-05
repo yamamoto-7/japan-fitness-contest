@@ -2,11 +2,17 @@ import { loadEnvConfig } from "@next/env";
 
 loadEnvConfig(process.cwd());
 
+const seedOrganizations = [
+  { id: "20000000-0000-4000-8000-000000000001", name: "SAMPLE FITNESS" },
+  { id: "20000000-0000-4000-8000-000000000002", name: "DEMO PHYSIQUE" },
+  { id: "20000000-0000-4000-8000-000000000003", name: "TEST BODYBUILDING" },
+] as const;
+
 const seedEvents = [
   {
     id: "10000000-0000-4000-8000-000000000001",
     name: "サンプル・フィットネス東京大会 2026",
-    organization: "SAMPLE FITNESS",
+    organization: seedOrganizations[0].name,
     startDate: "2026-08-23",
     endDate: "2026-08-23",
     location: "東京都（開発用会場）",
@@ -17,7 +23,7 @@ const seedEvents = [
   {
     id: "10000000-0000-4000-8000-000000000002",
     name: "サンプル・ボディメイク大阪大会 2026",
-    organization: "DEMO PHYSIQUE",
+    organization: seedOrganizations[1].name,
     startDate: "2026-09-12",
     endDate: "2026-09-13",
     location: "大阪府（開発用会場）",
@@ -28,7 +34,7 @@ const seedEvents = [
   {
     id: "10000000-0000-4000-8000-000000000003",
     name: "サンプル・フィジーク名古屋大会 2026",
-    organization: "SAMPLE FITNESS",
+    organization: seedOrganizations[0].name,
     startDate: "2026-10-04",
     endDate: "2026-10-04",
     location: "愛知県（開発用会場）",
@@ -39,7 +45,7 @@ const seedEvents = [
   {
     id: "10000000-0000-4000-8000-000000000004",
     name: "サンプル・ボディビル福岡大会 2026",
-    organization: "TEST BODYBUILDING",
+    organization: seedOrganizations[2].name,
     startDate: "2026-11-15",
     endDate: "2026-11-15",
     location: "福岡県（開発用会場）",
@@ -50,7 +56,7 @@ const seedEvents = [
   {
     id: "10000000-0000-4000-8000-000000000005",
     name: "サンプル・フィットネス横浜大会 2027",
-    organization: "DEMO PHYSIQUE",
+    organization: seedOrganizations[1].name,
     startDate: "2027-01-17",
     endDate: "2027-01-17",
     location: "神奈川県（開発用会場）",
@@ -61,19 +67,37 @@ const seedEvents = [
 ] as const;
 
 async function seed() {
-  const { databaseClient, db, events } = await import("./client");
+  const { databaseClient, db, events, organizations } = await import("./client");
 
   try {
     await db.transaction(async (tx) => {
+      const organizationIds = new Map<string, string>();
+
+      for (const organization of seedOrganizations) {
+        const [savedOrganization] = await tx
+          .insert(organizations)
+          .values(organization)
+          .onConflictDoUpdate({
+            target: organizations.name,
+            set: { updatedAt: new Date() },
+          })
+          .returning({ id: organizations.id, name: organizations.name });
+        organizationIds.set(savedOrganization.name, savedOrganization.id);
+      }
+
       for (const event of seedEvents) {
+        const { organization, ...eventValues } = event;
+        const organizationId = organizationIds.get(organization);
+        if (!organizationId) throw new Error(`Organization not found: ${organization}`);
+
         await tx
           .insert(events)
-          .values(event)
+          .values({ ...eventValues, organizationId })
           .onConflictDoUpdate({
             target: events.id,
             set: {
               name: event.name,
-              organization: event.organization,
+              organizationId,
               startDate: event.startDate,
               endDate: event.endDate,
               location: event.location,
@@ -86,7 +110,9 @@ async function seed() {
       }
     });
 
-    console.log(`Seeded ${seedEvents.length} development events.`);
+    console.log(
+      `Seeded ${seedOrganizations.length} organizations and ${seedEvents.length} development events.`,
+    );
   } finally {
     await databaseClient.end();
   }

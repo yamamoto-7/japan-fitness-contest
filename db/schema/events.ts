@@ -10,13 +10,16 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+import { organizations } from "./organizations";
 
 export const events = pgTable(
   "events",
   {
     id: uuid("id").defaultRandom().primaryKey(),
     name: varchar("name", { length: 200 }).notNull(),
-    organization: varchar("organization", { length: 100 }).notNull(),
+    organizationId: uuid("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "restrict", onUpdate: "cascade" }),
     startDate: date("start_date", { mode: "string" }).notNull(),
     endDate: date("end_date", { mode: "string" }).notNull(),
     location: varchar("location", { length: 255 }).notNull(),
@@ -32,10 +35,6 @@ export const events = pgTable(
   },
   (table) => [
     check("events_name_not_blank", sql`char_length(trim(${table.name})) > 0`),
-    check(
-      "events_organization_not_blank",
-      sql`char_length(trim(${table.organization})) > 0`,
-    ),
     check(
       "events_location_not_blank",
       sql`char_length(trim(${table.location})) > 0`,
@@ -54,11 +53,10 @@ export const events = pgTable(
       table.startDate,
       table.endDate,
     ),
-    index("events_organization_idx").on(table.organization),
+    index("events_organization_id_idx").on(table.organizationId),
     index("events_updated_at_idx").on(table.updatedAt.desc()),
   ],
 );
 
 export type Event = typeof events.$inferSelect;
 export type NewEvent = typeof events.$inferInsert;
-

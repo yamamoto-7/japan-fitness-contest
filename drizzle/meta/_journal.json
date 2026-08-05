@@ -8,6 +8,20 @@
       "when": 1785920092897,
       "tag": "0000_supreme_bucky",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1785925774924,
+      "tag": "0001_add-organizations",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1785925796576,
+      "tag": "0002_link-events-organizations",
+      "breakpoints": true
     }
   ]
 }

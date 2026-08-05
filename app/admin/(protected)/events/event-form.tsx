@@ -7,7 +7,7 @@ import styles from "../../admin.module.css";
 
 export type EventFormValues = {
   name: string;
-  organization: string;
+  organizationId: string;
   startDate: string;
   endDate: string;
   location: string;
@@ -19,11 +19,12 @@ export type EventFormValues = {
 type Props = {
   eventId?: string;
   initialValues?: EventFormValues;
+  organizations: Array<{ id: string; name: string }>;
 };
 
 const emptyValues: EventFormValues = {
   name: "",
-  organization: "",
+  organizationId: "",
   startDate: "",
   endDate: "",
   location: "",
@@ -32,7 +33,7 @@ const emptyValues: EventFormValues = {
   isPublished: false,
 };
 
-export function EventForm({ eventId, initialValues = emptyValues }: Props) {
+export function EventForm({ eventId, initialValues = emptyValues, organizations }: Props) {
   const router = useRouter();
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -45,7 +46,7 @@ export function EventForm({ eventId, initialValues = emptyValues }: Props) {
     const formData = new FormData(event.currentTarget);
     const body = {
       name: formData.get("name"),
-      organization: formData.get("organization"),
+      organizationId: formData.get("organizationId"),
       startDate: formData.get("startDate"),
       endDate: formData.get("endDate"),
       location: formData.get("location"),
@@ -85,7 +86,15 @@ export function EventForm({ eventId, initialValues = emptyValues }: Props) {
         </label>
         <label>
           <span>団体名 *</span>
-          <input defaultValue={initialValues.organization} maxLength={100} name="organization" required />
+          <select defaultValue={initialValues.organizationId} name="organizationId" required>
+            <option value="" disabled>団体を選択してください</option>
+            {organizations.map((organization) => (
+              <option key={organization.id} value={organization.id}>{organization.name}</option>
+            ))}
+          </select>
+          {organizations.length === 0 ? (
+            <small className={styles.fieldHint}>登録済みの団体がありません。</small>
+          ) : null}
         </label>
         <label>
           <span>開催地 *</span>
@@ -114,7 +123,11 @@ export function EventForm({ eventId, initialValues = emptyValues }: Props) {
       </div>
       <div className={styles.formActions}>
         <Link className={styles.secondaryButton} href="/admin/events">キャンセル</Link>
-        <button className={styles.primaryButton} disabled={isSubmitting} type="submit">
+        <button
+          className={styles.primaryButton}
+          disabled={isSubmitting || organizations.length === 0}
+          type="submit"
+        >
           {isSubmitting ? "保存中..." : "保存する"}
         </button>
       </div>

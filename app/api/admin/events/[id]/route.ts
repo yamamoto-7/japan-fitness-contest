@@ -16,6 +16,7 @@ import {
   eventInputSchema,
   eventPatchSchema,
 } from "@/lib/events/validation";
+import { organizationExists } from "@/lib/organizations/repository";
 
 type Context = { params: Promise<{ id: string }> };
 
@@ -66,7 +67,7 @@ export async function PATCH(request: Request, context: Context) {
 
     const merged = eventInputSchema.safeParse({
       name: current.name,
-      organization: current.organization,
+      organizationId: current.organizationId,
       startDate: current.startDate,
       endDate: current.endDate,
       location: current.location,
@@ -76,6 +77,18 @@ export async function PATCH(request: Request, context: Context) {
       ...patch.data,
     });
     if (!merged.success) return validationError(merged.error);
+
+    if (!(await organizationExists(merged.data.organizationId))) {
+      return NextResponse.json(
+        {
+          error: {
+            code: "ORGANIZATION_NOT_FOUND",
+            message: "選択した団体が見つかりません。",
+          },
+        },
+        { status: 400 },
+      );
+    }
 
     const event = await updateAdminEvent(parsedId.data, merged.data);
     if (!event) return eventNotFound();
