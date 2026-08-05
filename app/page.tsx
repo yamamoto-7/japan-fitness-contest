@@ -44,25 +44,6 @@ const featuredEvents = [
   },
 ];
 
-function Logo({ compact = false }: { compact?: boolean }) {
-  return (
-    <span className={styles.logo}>
-      <svg
-        className={styles.logoMark}
-        viewBox="0 0 48 48"
-        aria-hidden="true"
-      >
-        <path d="M7 29 15 21l5 6 4-17 4 17 5-6 8 8-8 8-9-5-9 5Z" />
-        <path d="M14 38h20M10 15l7 5M38 15l-7 5" />
-      </svg>
-      <span className={styles.logoText}>
-        <span>JAPAN FITNESS</span>
-        {!compact && <span>CONTEST</span>}
-      </span>
-    </span>
-  );
-}
-
 function ArrowIcon() {
   return (
     <svg viewBox="0 0 20 20" aria-hidden="true">
@@ -91,44 +72,7 @@ function PinIcon() {
 
 export default function Home() {
   return (
-    <div className={styles.siteShell}>
-      <header className={styles.header}>
-        <div className={styles.headerInner}>
-          <a href="#top" aria-label="Japan Fitness Contest トップへ">
-            <Logo />
-          </a>
-
-          <nav className={styles.desktopNav} aria-label="メインナビゲーション">
-            <a className={styles.activeNav} href="#top">ホーム</a>
-            <a href="#featured">大会一覧</a>
-            <a href="#calendar">カレンダー</a>
-            <a href="#contact">お知らせ</a>
-          </nav>
-
-          <a className={styles.searchButton} href="#featured" aria-label="大会を検索">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <circle cx="11" cy="11" r="6.5" />
-              <path d="m16 16 4 4" />
-            </svg>
-          </a>
-
-          <details className={styles.mobileMenu}>
-            <summary aria-label="メニューを開く">
-              <span />
-              <span />
-              <span />
-            </summary>
-            <nav aria-label="モバイルナビゲーション">
-              <a href="#top">ホーム</a>
-              <a href="#featured">大会一覧</a>
-              <a href="#calendar">カレンダー</a>
-              <a href="#news">お知らせ</a>
-            </nav>
-          </details>
-        </div>
-      </header>
-
-      <main>
+    <>
         <section className={styles.hero} id="top" aria-labelledby="hero-title">
           <Image
             className={styles.heroImage}
@@ -249,30 +193,6 @@ export default function Home() {
             </div>
           </div>
         </section>
-      </main>
-
-      <footer className={styles.footer}>
-        <div className={styles.footerInner}>
-          <div className={styles.footerBrand}>
-            <Logo />
-            <p>
-              日本のフィットネス・ボディビル大会情報をまとめた非公式サイトです。
-            </p>
-          </div>
-          <div className={styles.footerLinks}>
-            <div>
-              <h3>メニュー</h3>
-              <a href="#top">ホーム</a>
-              <a href="#featured">大会一覧</a>
-              <a href="#calendar">カレンダー</a>
-            </div>
-          </div>
-        </div>
-        <div className={styles.copyright}>
-          <span>© 2026 Japan Fitness Contest. All Rights Reserved.</span>
-          <span>UNOFFICIAL FITNESS MEDIA</span>
-        </div>
-      </footer>
-    </div>
+    </>
   );
 }

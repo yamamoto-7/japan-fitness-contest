@@ -4,12 +4,18 @@
   --gold: #d2aa55;
   --muted: #9da19f;
   --line: rgba(255, 255, 255, 0.13);
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
   overflow: hidden;
   background:
     radial-gradient(circle at 70% 15%, rgba(123, 72, 20, 0.08), transparent 28rem),
     #050706;
   color: #f7f6f1;
+}
+
+.siteShell > main {
+  flex: 1;
 }
 
 .header {
