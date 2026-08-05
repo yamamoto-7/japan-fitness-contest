@@ -392,7 +392,7 @@
 
 .eventGrid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
   gap: 20px;
 }
 
@@ -514,6 +514,16 @@
   justify-content: center;
   margin-top: 36px;
   scroll-margin-top: 30px;
+}
+
+.publicEmptyState {
+  margin: 0;
+  padding: 58px 24px;
+  border: 1px solid var(--line);
+  background: #0b0e0d;
+  color: #858b88;
+  font-size: 12px;
+  text-align: center;
 }
 
 .contactSection {
@@ -691,15 +701,6 @@
     font-size: clamp(52px, 9vw, 75px);
   }
 
-  .eventGrid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .eventCard:last-child {
-    grid-column: 1 / -1;
-    width: calc(50% - 10px);
-  }
-
   .footerInner {
     grid-template-columns: 1fr;
     gap: 44px;
@@ -813,15 +814,6 @@
   .eventSummary span,
   .eventSummary small {
     display: none;
-  }
-
-  .eventGrid {
-    grid-template-columns: 1fr;
-  }
-
-  .eventCard:last-child {
-    grid-column: auto;
-    width: auto;
   }
 
   .cardImageWrap {

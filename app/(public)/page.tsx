@@ -1,5 +1,8 @@
 import Image from "next/image";
+import Link from "next/link";
+import { connection } from "next/server";
 import heroImage from "@/public/images/top-page.png";
+import { getUpcomingPublicEvents } from "@/lib/events/repository";
 import styles from "../page.module.css";
 
 const newsItems = [
@@ -17,32 +20,23 @@ const newsItems = [
   },
 ];
 
-const featuredEvents = [
-  {
-    organization: "ZENIX",
-    name: "ZENIX JAPAN OPEN 2026",
-    date: "2026.06.15（日）",
-    location: "東京都",
-    tone: "red",
-    position: "58% center",
-  },
-  {
-    organization: "JBBF",
-    name: "JBBF 全日本ボディビル選手権大会",
-    date: "2026.07.20（月・祝）",
-    location: "大阪府",
-    tone: "green",
-    position: "34% center",
-  },
-  {
-    organization: "IFBB",
-    name: "IFBB PRO LEAGUE JAPAN PRO 2026",
-    date: "2026.08.10（月）",
-    location: "東京都",
-    tone: "gold",
-    position: "74% center",
-  },
-];
+const cardStyles = [
+  { tone: "red", position: "58% center" },
+  { tone: "green", position: "34% center" },
+  { tone: "gold", position: "74% center" },
+] as const;
+
+function formatEventDate(startDate: string, endDate: string) {
+  const formatter = new Intl.DateTimeFormat("ja-JP", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    weekday: "short",
+    timeZone: "Asia/Tokyo",
+  });
+  const format = (value: string) => formatter.format(new Date(`${value}T00:00:00+09:00`));
+  return startDate === endDate ? format(startDate) : `${format(startDate)} 〜 ${format(endDate)}`;
+}
 
 function ArrowIcon() {
   return (
@@ -70,7 +64,10 @@ function PinIcon() {
   );
 }
 
-export default function Home() {
+export default async function Home() {
+  await connection();
+  const upcomingEvents = await getUpcomingPublicEvents(3);
+
   return (
     <>
         <section className={styles.hero} id="top" aria-labelledby="hero-title">
@@ -98,14 +95,10 @@ export default function Home() {
                 ZENIX・JBBF・IFBBを中心に、全国の大会日程と開催情報を掲載。
               </p>
               <div className={styles.heroActions}>
-                <a className={styles.primaryButton} href="#featured">
-                  大会を探す
-                  <ArrowIcon />
-                </a>
-                <a className={styles.secondaryButton} href="#calendar">
+                <Link className={styles.secondaryButton} href="/events">
                   <CalendarIcon />
                   カレンダーを見る
-                </a>
+                </Link>
               </div>
             </div>
           </div>
@@ -144,52 +137,60 @@ export default function Home() {
           <div className={styles.sectionInner}>
             <div className={styles.sectionHeadingRow}>
               <div>
-                <p className={styles.sectionLabel}>FEATURED EVENTS</p>
-                <h2 id="featured-title">注目の大会</h2>
+                <p className={styles.sectionLabel}>UPCOMING EVENTS</p>
+                <h2 id="featured-title">直近の大会</h2>
               </div>
-              <div className={styles.eventSummary} aria-label="今月の公開大会数">
-                <span>2026 JUNE</span>
-                <strong>12</strong>
+              <div className={styles.eventSummary} aria-label={`直近の公開大会${upcomingEvents.length}件`}>
+                <span>NEXT</span>
+                <strong>{upcomingEvents.length}</strong>
                 <small>EVENTS</small>
               </div>
             </div>
 
-            <div className={styles.eventGrid}>
-              {featuredEvents.map((event, index) => (
-                <article className={`${styles.eventCard} ${styles[event.tone]}`} key={event.name}>
-                  <div className={styles.cardImageWrap}>
-                    <Image
-                      className={styles.cardImage}
-                      src={heroImage}
-                      alt=""
-                      fill
-                      sizes="(max-width: 760px) 100vw, 33vw"
-                      style={{ objectPosition: event.position }}
-                    />
-                    <div className={styles.cardImageShade} />
-                    <span className={styles.organizationTag}>{event.organization}</span>
-                    <span className={styles.cardNumber}>0{index + 1}</span>
-                  </div>
-                  <div className={styles.cardBody}>
-                    <h3>{event.name}</h3>
-                    <div className={styles.eventMeta}>
-                      <span><CalendarIcon />{event.date}</span>
-                      <span><PinIcon />{event.location}</span>
-                    </div>
-                    <a href="#contact" aria-label={`${event.name}の詳細を見る`}>
-                      詳細を見る
-                      <ArrowIcon />
-                    </a>
-                  </div>
-                </article>
-              ))}
-            </div>
+            {upcomingEvents.length === 0 ? (
+              <p className={styles.publicEmptyState}>現在公開中の直近大会はありません。</p>
+            ) : (
+              <div className={styles.eventGrid}>
+                {upcomingEvents.map((event, index) => {
+                  const cardStyle = cardStyles[index];
+                  const calendarMonth = event.startDate.slice(0, 7);
+                  return (
+                    <article className={`${styles.eventCard} ${styles[cardStyle.tone]}`} key={event.id}>
+                      <div className={styles.cardImageWrap}>
+                        <Image
+                          className={styles.cardImage}
+                          src={heroImage}
+                          alt=""
+                          fill
+                          sizes="(max-width: 760px) 100vw, 33vw"
+                          style={{ objectPosition: cardStyle.position }}
+                        />
+                        <div className={styles.cardImageShade} />
+                        <span className={styles.organizationTag}>{event.organization}</span>
+                        <span className={styles.cardNumber}>0{index + 1}</span>
+                      </div>
+                      <div className={styles.cardBody}>
+                        <h3>{event.name}</h3>
+                        <div className={styles.eventMeta}>
+                          <span><CalendarIcon />{formatEventDate(event.startDate, event.endDate)}</span>
+                          <span><PinIcon />{event.location}</span>
+                        </div>
+                        <Link href={`/events?month=${calendarMonth}`} aria-label={`${event.name}をカレンダーで見る`}>
+                          カレンダーで見る
+                          <ArrowIcon />
+                        </Link>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            )}
 
-            <div className={styles.centerAction} id="calendar">
-              <a className={styles.outlineButton} href="#featured">
-                すべての大会を見る
+            <div className={styles.centerAction}>
+              <Link className={styles.outlineButton} href="/events">
+                カレンダーを見る
                 <ArrowIcon />
-              </a>
+              </Link>
             </div>
           </div>
         </section>

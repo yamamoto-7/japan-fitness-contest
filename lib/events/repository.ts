@@ -1,6 +1,6 @@
 import "server-only";
 
-import { and, count, desc, eq, gte, ilike, or, type SQL } from "drizzle-orm";
+import { and, asc, count, desc, eq, gte, ilike, or, type SQL } from "drizzle-orm";
 import { db, events, type Event } from "@/db";
 import type { EventInput } from "./validation";
 
@@ -86,6 +86,26 @@ export async function getAdminDashboard() {
     upcoming: upcoming.value,
     recent,
   };
+}
+
+export async function getUpcomingPublicEvents(limit = 3) {
+  const today = new Intl.DateTimeFormat("sv-SE", {
+    timeZone: "Asia/Tokyo",
+  }).format(new Date());
+
+  return db
+    .select({
+      id: events.id,
+      name: events.name,
+      organization: events.organization,
+      startDate: events.startDate,
+      endDate: events.endDate,
+      location: events.location,
+    })
+    .from(events)
+    .where(and(eq(events.isPublished, true), gte(events.startDate, today)))
+    .orderBy(asc(events.startDate), asc(events.endDate), asc(events.name))
+    .limit(limit);
 }
 
 export function serializeAdminEvent(event: Event) {
