@@ -102,7 +102,6 @@ export default function Home() {
             <a className={styles.activeNav} href="#top">ホーム</a>
             <a href="#featured">大会一覧</a>
             <a href="#calendar">カレンダー</a>
-            <a href="#news">団体一覧</a>
             <a href="#contact">お知らせ</a>
           </nav>
 
@@ -250,20 +249,6 @@ export default function Home() {
             </div>
           </div>
         </section>
-
-        <section className={styles.contactSection} id="contact" aria-labelledby="contact-title">
-          <div className={styles.contactInner}>
-            <div>
-              <p className={styles.sectionLabel}>CONTACT</p>
-              <h2 id="contact-title">大会情報を見逃さない</h2>
-              <p>新着情報をメールで受け取ることができます。</p>
-            </div>
-            <a className={styles.primaryButton} href="mailto:info@example.com">
-              メールで受け取る
-              <ArrowIcon />
-            </a>
-          </div>
-        </section>
       </main>
 
       <footer className={styles.footer}>
@@ -280,18 +265,6 @@ export default function Home() {
               <a href="#top">ホーム</a>
               <a href="#featured">大会一覧</a>
               <a href="#calendar">カレンダー</a>
-            </div>
-            <div>
-              <h3>団体</h3>
-              <a href="#featured">ZENIX</a>
-              <a href="#featured">JBBF</a>
-              <a href="#featured">IFBB</a>
-            </div>
-            <div>
-              <h3>その他</h3>
-              <a href="#contact">お問い合わせ</a>
-              <a href="#top">利用規約</a>
-              <a href="#top">プライバシーポリシー</a>
             </div>
           </div>
         </div>
