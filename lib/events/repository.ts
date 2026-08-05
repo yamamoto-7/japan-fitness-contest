@@ -1,6 +1,6 @@
 import "server-only";
 
-import { and, asc, count, desc, eq, gte, ilike, or, type SQL } from "drizzle-orm";
+import { and, asc, count, desc, eq, gte, ilike, lte, or, type SQL } from "drizzle-orm";
 import { db, events, organizations, type Event } from "@/db";
 import type { EventInput } from "./validation";
 
@@ -137,6 +137,39 @@ export async function getUpcomingPublicEvents(limit = 3) {
     .where(and(eq(events.isPublished, true), gte(events.startDate, today)))
     .orderBy(asc(events.startDate), asc(events.endDate), asc(events.name))
     .limit(limit);
+}
+
+export async function getPublicCalendarEvents({
+  firstDate,
+  lastDate,
+  organizationId,
+}: {
+  firstDate: string;
+  lastDate: string;
+  organizationId?: string;
+}) {
+  const conditions = [
+    eq(events.isPublished, true),
+    lte(events.startDate, lastDate),
+    gte(events.endDate, firstDate),
+  ];
+  if (organizationId) conditions.push(eq(events.organizationId, organizationId));
+
+  return db
+    .select({
+      id: events.id,
+      name: events.name,
+      organizationId: events.organizationId,
+      organization: organizations.name,
+      startDate: events.startDate,
+      endDate: events.endDate,
+      location: events.location,
+      officialUrl: events.officialUrl,
+    })
+    .from(events)
+    .innerJoin(organizations, eq(events.organizationId, organizations.id))
+    .where(and(...conditions))
+    .orderBy(asc(events.startDate), asc(events.name));
 }
 
 export function serializeAdminEvent(event: AdminEvent) {

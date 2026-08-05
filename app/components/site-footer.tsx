@@ -17,7 +17,7 @@ export function SiteFooter() {
             <h3>メニュー</h3>
             <Link href="/#top">ホーム</Link>
             <Link href="/#featured">大会一覧</Link>
-            <Link href="/#calendar">カレンダー</Link>
+            <Link href="/events">カレンダー</Link>
           </div>
         </div>
       </div>
