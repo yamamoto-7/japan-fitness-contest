@@ -28,7 +28,7 @@ npm install
 npm run dev
 ```
 
-開発サーバーは通常 `http://localhost:3000` です。DB実装後は `.env.local` の設定、マイグレーション、開発用シード、管理者作成の手順を追加します。実際のDrizzle用npm scriptも導入時に `package.json` と本書へ追加します。
+開発サーバーは通常 `http://localhost:3000` です。管理者認証を利用する場合は `.env.local` に `AUTH_SECRET`、`ADMIN_EMAIL`、`ADMIN_PASSWORD_HASH` を設定します。DB実装後はマイグレーションと開発用大会シードの手順を追加します。実際のDrizzle用npm scriptも導入時に `package.json` と本書へ追加します。
 
 ## 4. 推奨実装順序
 

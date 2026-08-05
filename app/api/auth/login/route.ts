@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { verifyAdminCredentials } from "@/lib/auth/admin-user";
+import {
+  AdminConfigurationError,
+  verifyAdminCredentials,
+} from "@/lib/auth/admin-user";
 import { setSessionCookie } from "@/lib/auth/cookies";
 import { isSameOriginRequest } from "@/lib/auth/request";
 import { createSessionToken } from "@/lib/auth/session";
@@ -29,7 +32,21 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: "入力内容を確認してください。" }, { status: 400 });
   }
 
-  const admin = verifyAdminCredentials(parsed.data.email, parsed.data.password);
+  let admin;
+
+  try {
+    admin = verifyAdminCredentials(parsed.data.email, parsed.data.password);
+  } catch (error) {
+    if (error instanceof AdminConfigurationError) {
+      console.error("Admin authentication environment variables are not configured.");
+      return NextResponse.json(
+        { message: "管理者認証の設定に問題があります。" },
+        { status: 500 },
+      );
+    }
+
+    throw error;
+  }
 
   if (!admin) {
     return NextResponse.json(
@@ -42,4 +59,3 @@ export async function POST(request: Request) {
   setSessionCookie(response, createSessionToken(admin));
   return response;
 }
-

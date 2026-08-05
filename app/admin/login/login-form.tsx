@@ -63,7 +63,7 @@ export function LoginForm({ sessionReason }: { sessionReason?: string }) {
           autoComplete="username"
           id="email"
           name="email"
-          placeholder="admin@example.com"
+          placeholder="name@example.com"
           required
           type="email"
         />
@@ -85,4 +85,3 @@ export function LoginForm({ sessionReason }: { sessionReason?: string }) {
     </>
   );
 }
-
