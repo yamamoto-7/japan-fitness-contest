@@ -1,6 +1,6 @@
 import Image from "next/image";
 import heroImage from "@/public/images/top-page.png";
-import styles from "./page.module.css";
+import styles from "../page.module.css";
 
 const newsItems = [
   {

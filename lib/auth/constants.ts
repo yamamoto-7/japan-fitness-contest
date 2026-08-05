@@ -1,0 +1,4 @@
+export const SESSION_COOKIE_NAME = "jfc_admin_session";
+export const SESSION_IDLE_TIMEOUT_SECONDS = 10 * 60;
+export const SESSION_IDLE_TIMEOUT_MS = SESSION_IDLE_TIMEOUT_SECONDS * 1000;
+
